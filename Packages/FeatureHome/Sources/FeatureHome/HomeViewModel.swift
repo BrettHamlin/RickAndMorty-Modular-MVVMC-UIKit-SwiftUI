@@ -14,6 +14,7 @@ import SwiftUI
 public final class HomeViewModel: ObservableObject {
     
     @Published public var state: HomeViewState = .loading
+    @Published public var selectedFilter: CharacterStatusType = .all
     
     public var onDetailRequested: ((Character) -> Void)?
     
@@ -21,6 +22,19 @@ public final class HomeViewModel: ObservableObject {
     
     public init() {}
     
+    public var filteredCharacters: [Character] {
+        guard case .success(let characters) = state else {
+            return []
+        }
+
+        switch selectedFilter {
+        case .all:
+            return characters
+        case .alive, .dead, .unknown:
+            return characters.filter { $0.status == selectedFilter }
+        }
+    }
+
     public func fetchCharacters() {
         state = .loading
         Task {
@@ -47,6 +61,8 @@ public final class HomeViewModel: ObservableObject {
 extension CharacterStatusType {
     var color: Color {
         switch self {
+        case .all:
+            return .primary
         case .alive:
             return .green
         case .dead:
@@ -58,9 +74,19 @@ extension CharacterStatusType {
     
     var iconName: String {
         switch self {
+        case .all: return "line.3.horizontal.decrease.circle"
         case .alive: return "heart.fill"
         case .dead: return "heart.slash.fill"
         case .unknown: return "questionmark.circle"
+        }
+    }
+
+    var filterTitle: String {
+        switch self {
+        case .all: return "All"
+        case .alive: return "Alive"
+        case .dead: return "Dead"
+        case .unknown: return "Unknown"
         }
     }
 }

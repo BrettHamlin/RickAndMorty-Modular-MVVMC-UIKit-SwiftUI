@@ -8,7 +8,7 @@
 import Foundation
 import Domain
 
-public enum HomeViewState: Sendable {
+public enum HomeViewState: Equatable, Sendable {
     case loading
     case success([Character])
     case failure(String)

@@ -18,14 +18,26 @@ public struct HomeView: View {
     }
     
     public var body: some View {
-        ZStack {
+        VStack {
+            Picker("Status", selection: $viewModel.selectedFilter) {
+                ForEach(CharacterStatusType.allCases, id: \.self) { status in
+                    Text(status.filterTitle)
+                        .tag(status)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding([.horizontal, .top])
+            .accessibilityIdentifier("filter_picker")
+
             switch viewModel.state {
             case .loading:
+                Spacer()
                 ProgressView("Loading...")
                     .scaleEffect(1.7)
                     .accessibilityIdentifier("loading_indicator")
-            case .success(let characters):
-                List(characters) { character in
+                Spacer()
+            case .success:
+                List(viewModel.filteredCharacters) { character in
                     Button {
                         viewModel.didSelect(character: character)
                     } label: {
@@ -52,7 +64,9 @@ public struct HomeView: View {
                 .listStyle(.plain)
                 .accessibilityIdentifier("character_list")
             case .failure(let error):
+                Spacer()
                 Text(error).foregroundStyle(.red)
+                Spacer()
             }
         }
         .task {
