@@ -25,6 +25,15 @@ let package = Package(
                 "Domain",
                 "Core"
             ]
+        ),
+        .testTarget(
+            //harness:criterion=c-package-test-target-added
+            name: "FeatureHomeTests",
+            dependencies: [
+                "FeatureHome",
+                "Domain",
+                "Core"
+            ]
         )
     ]
 )

@@ -18,42 +18,53 @@ public struct HomeView: View {
     }
     
     public var body: some View {
-        ZStack {
-            switch viewModel.state {
-            case .loading:
-                ProgressView("Loading...")
-                    .scaleEffect(1.7)
-                    .accessibilityIdentifier("loading_indicator")
-            case .success(let characters):
-                List(characters) { character in
-                    Button {
-                        viewModel.didSelect(character: character)
-                    } label: {
-                        HStack {
-                            AsyncImage(url: URL(string: character.image)) { img in
-                                img.resizable()
-                            } placeholder: {
-                                Color.gray.opacity(0.3)
-                            }
-                            .frame(width: 50, height: 50)
-                            .clipShape(Circle())
-                            
-                            Text(character.name)
-                                .font(.headline)
-                                .foregroundStyle(.primary)
-                            
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.gray)
-                        }
-                    }
-                    .accessibilityIdentifier("row_\(character.name)")
+        VStack(spacing: 0) {
+            Picker("Status", selection: $viewModel.selectedFilter) {
+                ForEach(CharacterStatusFilter.allCases) { filter in
+                    Text(filter.rawValue).tag(filter)
                 }
-                .listStyle(.plain)
-                .accessibilityIdentifier("character_list")
-            case .failure(let error):
-                Text(error).foregroundStyle(.red)
             }
+            .pickerStyle(.segmented)
+            .padding()
+            
+            ZStack {
+                switch viewModel.state {
+                case .loading:
+                    ProgressView("Loading...")
+                        .scaleEffect(1.7)
+                        .accessibilityIdentifier("loading_indicator")
+                case .success(let characters):
+                    List(characters) { character in
+                        Button {
+                            viewModel.didSelect(character: character)
+                        } label: {
+                            HStack {
+                                AsyncImage(url: URL(string: character.image)) { img in
+                                    img.resizable()
+                                } placeholder: {
+                                    Color.gray.opacity(0.3)
+                                }
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                                
+                                Text(character.name)
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                                
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.gray)
+                            }
+                        }
+                        .accessibilityIdentifier("row_\(character.name)")
+                    }
+                    .listStyle(.plain)
+                    .accessibilityIdentifier("character_list")
+                case .failure(let error):
+                    Text(error).foregroundStyle(.red)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .task {
             viewModel.fetchCharacters()

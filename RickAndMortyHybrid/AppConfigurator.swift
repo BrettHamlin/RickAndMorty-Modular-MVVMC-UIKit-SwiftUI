@@ -47,6 +47,22 @@ private struct UITestingCharacterRepository: CharacterRepositoryProtocol {
                 species: "Human",
                 gender: "Male",
                 image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg"
+            ),
+            Character(
+                id: 3,
+                name: "Birdperson",
+                status: .dead,
+                species: "Bird-Person",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/47.jpeg"
+            ),
+            Character(
+                id: 4,
+                name: "Squanchy",
+                status: .unknown,
+                species: "Cat-Person",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/331.jpeg"
             )
         ]
     }
