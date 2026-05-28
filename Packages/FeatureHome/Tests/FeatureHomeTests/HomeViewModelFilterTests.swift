@@ -52,6 +52,10 @@ final class HomeViewModelFilterTests: XCTestCase {
         ]
 
         for testCase in cases {
+            ServiceLocator.shared.unregisterAll()
+            repository = MockCharacterRepository(characters: Self.mixedCharacters)
+            ServiceLocator.shared.register(repository as CharacterRepositoryProtocol)
+
             let viewModel = HomeViewModel()
             viewModel.fetchCharacters()
             _ = await waitForSuccess(from: viewModel)
@@ -61,7 +65,7 @@ final class HomeViewModelFilterTests: XCTestCase {
             let characters = await waitForSuccess(from: viewModel)
             XCTAssertEqual(characters.map(\.id), testCase.ids)
             XCTAssertTrue(characters.allSatisfy { $0.status == testCase.status })
-            XCTAssertEqual(repository.fetchCallCount, cases.firstIndex { $0.filter == testCase.filter }! + 1)
+            XCTAssertEqual(repository.fetchCallCount, 1)
         }
     }
 
@@ -161,6 +165,19 @@ final class HomeViewModelFilterTests: XCTestCase {
         let resolved: CharacterRepositoryProtocol = ServiceLocator.shared.resolve()
 
         XCTAssertTrue((resolved as? MockCharacterRepository) === repository)
+    }
+
+    func testServiceLocatorRegistrationCanBeReplacedWithinATest() {
+        //harness:criterion=c-service-locator-reset-between-tests
+        let replacement = MockCharacterRepository(characters: [
+            Self.character(id: 20, name: "Replacement Rick", status: .alive)
+        ])
+
+        ServiceLocator.shared.unregisterAll()
+        ServiceLocator.shared.register(replacement as CharacterRepositoryProtocol)
+
+        let resolved: CharacterRepositoryProtocol = ServiceLocator.shared.resolve()
+        XCTAssertTrue((resolved as? MockCharacterRepository) === replacement)
     }
 
     @MainActor

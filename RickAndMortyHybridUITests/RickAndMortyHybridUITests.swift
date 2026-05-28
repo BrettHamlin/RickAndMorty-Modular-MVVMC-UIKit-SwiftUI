@@ -139,9 +139,7 @@ final class FeatureHomeUITests: XCTestCase {
         app.launchArguments.append("--uitesting")
         app.launch()
 
-        let loadingIndicator = app.otherElements["loading_indicator"]
-
-        XCTAssertTrue(loadingIndicator.waitForExistence(timeout: 1), "Loading indicator was not exposed while the list was loading")
+        XCTAssertTrue(waitForLoadingIndicator(timeout: 1), "Loading indicator was not exposed while the list was loading")
     }
 
     func testFilteredCharacterListCanStillBeScrolled() throws {
@@ -151,8 +149,17 @@ final class FeatureHomeUITests: XCTestCase {
 
         let list = characterList
         XCTAssertTrue(list.exists)
-        list.swipeUp()
-        XCTAssertTrue(app.state == .runningForeground)
+
+        let offscreenAliveRow = app.buttons["row_Alexander"]
+        XCTAssertFalse(offscreenAliveRow.isHittable, "Expected row_Alexander to start outside the visible filtered list")
+
+        var swipeAttempts = 0
+        while !offscreenAliveRow.isHittable && swipeAttempts < 6 {
+            list.swipeUp()
+            swipeAttempts += 1
+        }
+
+        XCTAssertTrue(offscreenAliveRow.isHittable, "Expected the filtered character list to scroll to row_Alexander")
     }
 
     private var characterList: XCUIElement {
@@ -187,6 +194,15 @@ final class FeatureHomeUITests: XCTestCase {
         let segment = app.segmentedControls.buttons[title]
         XCTAssertTrue(segment.waitForExistence(timeout: 5), "Missing \(title) segment", file: file, line: line)
         segment.tap()
+    }
+
+    private func waitForLoadingIndicator(timeout: TimeInterval) -> Bool {
+        let activityIndicator = app.activityIndicators["loading_indicator"]
+        if activityIndicator.waitForExistence(timeout: timeout) {
+            return true
+        }
+
+        return app.otherElements["loading_indicator"].waitForExistence(timeout: timeout)
     }
 
     private func assertRowExists(_ name: String, file: StaticString = #filePath, line: UInt = #line) {

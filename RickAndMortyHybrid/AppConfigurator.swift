@@ -31,7 +31,9 @@ final class AppConfigurator {
 
 private struct UITestingCharacterRepository: CharacterRepositoryProtocol {
     func fetchCharacters() async throws -> [Character] {
-        [
+        try await Task.sleep(nanoseconds: 300_000_000)
+
+        return [
             Character(
                 id: 1,
                 name: "Rick Sanchez",
@@ -63,6 +65,86 @@ private struct UITestingCharacterRepository: CharacterRepositoryProtocol {
                 species: "Cat-Person",
                 gender: "Male",
                 image: "https://rickandmortyapi.com/api/character/avatar/331.jpeg"
+            ),
+            Character(
+                id: 5,
+                name: "Summer Smith",
+                status: .alive,
+                species: "Human",
+                gender: "Female",
+                image: "https://rickandmortyapi.com/api/character/avatar/3.jpeg"
+            ),
+            Character(
+                id: 6,
+                name: "Beth Smith",
+                status: .alive,
+                species: "Human",
+                gender: "Female",
+                image: "https://rickandmortyapi.com/api/character/avatar/4.jpeg"
+            ),
+            Character(
+                id: 7,
+                name: "Jerry Smith",
+                status: .alive,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/5.jpeg"
+            ),
+            Character(
+                id: 8,
+                name: "Abadango Cluster Princess",
+                status: .alive,
+                species: "Alien",
+                gender: "Female",
+                image: "https://rickandmortyapi.com/api/character/avatar/6.jpeg"
+            ),
+            Character(
+                id: 9,
+                name: "Abradolf Lincler",
+                status: .alive,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/7.jpeg"
+            ),
+            Character(
+                id: 10,
+                name: "Adjudicator Rick",
+                status: .alive,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/8.jpeg"
+            ),
+            Character(
+                id: 11,
+                name: "Agency Director",
+                status: .alive,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/9.jpeg"
+            ),
+            Character(
+                id: 12,
+                name: "Alan Rails",
+                status: .alive,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/10.jpeg"
+            ),
+            Character(
+                id: 13,
+                name: "Albert Einstein",
+                status: .alive,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/11.jpeg"
+            ),
+            Character(
+                id: 14,
+                name: "Alexander",
+                status: .alive,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/12.jpeg"
             )
         ]
     }
