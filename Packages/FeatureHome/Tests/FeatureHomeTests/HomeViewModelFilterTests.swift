@@ -71,6 +71,32 @@ final class HomeViewModelFilterTests: XCTestCase {
     }
 
     @MainActor
+    func testPreselectedStatusFilterAppliesToFetchedCharacters() async {
+        //harness:criterion=c-filter-alive-shows-alive-only,c-filter-dead-shows-dead-only,c-filter-unknown-shows-unknown-only
+        let cases: [(filter: CharacterStatusFilter, status: CharacterStatusType, ids: [Int])] = [
+            (.alive, .alive, [1]),
+            (.dead, .dead, [2]),
+            (.unknown, .unknown, [3])
+        ]
+
+        for testCase in cases {
+            ServiceLocator.shared.unregisterAll()
+            repository = MockCharacterRepository(characters: Self.mixedCharacters)
+            ServiceLocator.shared.register(repository as CharacterRepositoryProtocol)
+
+            let viewModel = HomeViewModel()
+            viewModel.selectedFilter = testCase.filter
+
+            viewModel.fetchCharacters()
+
+            let characters = await waitForSuccess(from: viewModel)
+            XCTAssertEqual(characters.map(\.id), testCase.ids)
+            XCTAssertTrue(characters.allSatisfy { $0.status == testCase.status })
+            XCTAssertEqual(repository.fetchCallCount, 1)
+        }
+    }
+
+    @MainActor
     func testChangingFilterDoesNotRefetchAndRestoresFullArray() async {
         //harness:criterion=c-filter-change-no-refetch,c-filter-full-array-retained
         let viewModel = HomeViewModel()

@@ -21,7 +21,7 @@ public struct HomeView: View {
         VStack(spacing: 0) {
             Picker("Status", selection: $viewModel.selectedFilter) {
                 ForEach(CharacterStatusFilter.allCases) { filter in
-                    Text(filter.rawValue).tag(filter)
+                    Text(filter.title).tag(filter)
                 }
             }
             .pickerStyle(.segmented)

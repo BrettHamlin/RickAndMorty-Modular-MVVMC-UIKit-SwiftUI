@@ -17,6 +17,7 @@ public enum CharacterStatusFilter: String, CaseIterable, Identifiable, Sendable 
     case unknown = "Unknown"
     
     public var id: Self { self }
+    public var title: String { rawValue }
     
     var matchingStatus: CharacterStatusType? {
         switch self {
