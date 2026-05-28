@@ -64,9 +64,24 @@ scope at warning/error severity when the reviewed diff supports them.
   exposes both backing data and an emitted UI-state signal, generated tests must
   assert both; array-only assertions are not enough if the controller uses the
   signal to show empty, loading, error, or success UI.
+- Generated iOS UI tests for transient loading or failure states use
+  deterministic fixture control. A fixed sleep, short artificial repository
+  delay, `DispatchQueue.asyncAfter`, or "wait one second and hope to catch the
+  spinner" assertion is not enough when the ticket explicitly requires proof
+  that loading or failure UI is preserved. Prefer a UI-test-only launch argument
+  or fixture hook that holds the app in loading/failure until the test observes
+  the requested state, then releases if recovery is also under test.
 - Generated unit/view-model tests assert product behavior directly. Avoid
   brittle tests that inspect source text, depend on unordered async timing, or
   require device-only capabilities.
+- For generated filter/search picker or segmented-control tests, require a
+  deterministic product-state oracle. A UI test that only checks already-visible
+  matching rows and immediate non-existence of nonmatching rows can pass when
+  the filter does nothing because offscreen cells are absent from the
+  accessibility tree. Prefer production-owned view-model, reducer, query, or
+  filter-helper assertions; if UI tests are used, they must prove the
+  before/after transition by first establishing a nonmatching row is present or
+  reachable before the filter and then absent after the filter.
 - UI tests are out of scope for the first smoke unless the ticket explicitly
   requires them; prefer unit, reducer, interactor, and view-inspection tests.
 
@@ -78,8 +93,14 @@ scope at warning/error severity when the reviewed diff supports them.
 - **D/error:** an existing filter/search/navigation/default behavior regresses,
   new state is not initialized for existing records, async refresh/retry can
   leave stale UI, a view model emits the wrong table/empty/loading/error signal
-  for the requested state, or tests depend on source-grep/mutable build
-  artifacts rather than product behavior.
+  for the requested state, tests depend on source-grep/mutable build artifacts
+  rather than product behavior, or the ticket explicitly requires deterministic
+  tests for a requested filter/search/navigation behavior but the generated
+  tests can pass when that behavior is absent.
+- **D/error:** the ticket explicitly requires loading or failure-state proof and
+  the generated UI test depends only on fixed sleeps, short fixture delays, or a
+  small timeout race to observe the transient state instead of a deterministic
+  UI-test launch mode or controllable fixture hook.
 - **B/warning:** advisory test-quality gaps, overstated test metadata,
   non-blocking uncertainty caused by progressive review clustering, or minor
   copy assertions when the product behavior itself is implemented and covered.
