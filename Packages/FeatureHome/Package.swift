@@ -25,6 +25,15 @@ let package = Package(
                 "Domain",
                 "Core"
             ]
+        ),
+        .testTarget(
+            name: "FeatureHomeTests",
+            dependencies: [
+                "FeatureHome",
+                "Core",
+                "Domain"
+            ],
+            path: "Tests/FeatureHomeTests"
         )
     ]
 )
