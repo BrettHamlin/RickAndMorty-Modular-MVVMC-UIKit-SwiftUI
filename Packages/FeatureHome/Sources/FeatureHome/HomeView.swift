@@ -25,6 +25,7 @@ public struct HomeView: View {
                 }
             }
             .pickerStyle(.segmented)
+            .accessibilityIdentifier("status_filter")
             .padding()
             
             ZStack {

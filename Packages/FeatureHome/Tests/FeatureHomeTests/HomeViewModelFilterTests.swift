@@ -26,6 +26,7 @@ final class HomeViewModelFilterTests: XCTestCase {
 
         XCTAssertEqual(CharacterStatusFilter.allCases.count, 4)
         XCTAssertEqual(Set(CharacterStatusFilter.allCases), [.all, .alive, .dead, .unknown])
+        XCTAssertEqual(CharacterStatusFilter.allCases.map(\.rawValue), ["All", "Alive", "Dead", "Unknown"])
         XCTAssertEqual(selectedFilter, .all)
     }
 
