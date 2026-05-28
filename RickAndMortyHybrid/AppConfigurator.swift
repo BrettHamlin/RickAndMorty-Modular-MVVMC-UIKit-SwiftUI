@@ -47,6 +47,22 @@ private struct UITestingCharacterRepository: CharacterRepositoryProtocol {
                 species: "Human",
                 gender: "Male",
                 image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg"
+            ),
+            Character(
+                id: 3,
+                name: "Adjudicator Rick",
+                status: .dead,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/8.jpeg"
+            ),
+            Character(
+                id: 4,
+                name: "Ants in my Eyes Johnson",
+                status: .unknown,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/20.jpeg"
             )
         ]
     }
