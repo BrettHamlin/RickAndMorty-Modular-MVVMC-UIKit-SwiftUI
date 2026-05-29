@@ -18,6 +18,17 @@ final class FeatureHomeUITests: XCTestCase {
         app.launch()
     }
     
+    // harness:criterion=c-homeview-filter-control-present,c-homeview-filter-control-accessibility-id
+    func testStatusFilterControlIsVisibleOnHomeScreen() throws {
+        let filterControls = app.descendants(matching: .any).matching(identifier: "status_filter_picker")
+        let filterControl = filterControls.element
+        
+        XCTAssertTrue(filterControl.waitForExistence(timeout: 5), "Status filter control was not found on the home screen.")
+        XCTAssertEqual(filterControls.count, 1)
+        XCTAssertTrue(filterControl.isHittable, "Status filter control should be hittable on the home screen.")
+    }
+    
+    // harness:criterion=c-homeview-character-list-accessibility-id-preserved,c-homeview-loading-indicator-accessibility-id-preserved,c-homeview-row-accessibility-id-preserved,c-app-coordinator-unchanged,c-ui-testing-repository-unchanged
     func testUserCanScrollAndOpenDetailWithoutCrash() throws {
         let loadingIndicator = app.otherElements["loading_indicator"]
         if loadingIndicator.exists {
