@@ -14,12 +14,25 @@ import SwiftUI
 public final class HomeViewModel: ObservableObject {
     
     @Published public var state: HomeViewState = .loading
+    @Published public var selectedFilter: CharacterStatusFilter = .all
     
     public var onDetailRequested: ((Character) -> Void)?
     
     @Inject private var repository: CharacterRepositoryProtocol
     
     public init() {}
+
+    public var filteredCharacters: [Character] {
+        guard case .success(let characters) = state else {
+            return []
+        }
+
+        guard let status = selectedFilter.status else {
+            return characters
+        }
+
+        return characters.filter { $0.status == status }
+    }
     
     public func fetchCharacters() {
         state = .loading
