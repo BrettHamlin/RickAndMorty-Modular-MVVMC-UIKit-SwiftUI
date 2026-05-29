@@ -64,13 +64,22 @@ scope at warning/error severity when the reviewed diff supports them.
   exposes both backing data and an emitted UI-state signal, generated tests must
   assert both; array-only assertions are not enough if the controller uses the
   signal to show empty, loading, error, or success UI.
-- Generated iOS UI tests for transient loading or failure states use
-  deterministic fixture control. A fixed sleep, short artificial repository
-  delay, `DispatchQueue.asyncAfter`, or "wait one second and hope to catch the
-  spinner" assertion is not enough when the ticket explicitly requires proof
-  that loading or failure UI is preserved. Prefer a UI-test-only launch argument
-  or fixture hook that holds the app in loading/failure until the test observes
-  the requested state, then releases if recovery is also under test.
+- Generated tests for transient loading or failure states prefer deterministic
+  unit, reducer, interactor, or view-model state tests over UI tests. Do not
+  require or invent a new infinite-loading UI-test launch mode, a repository
+  that sleeps forever, or a one-off `--uitesting-loading` /
+  `--uitesting-failure` argument merely to prove a newly added control is absent
+  outside success state. Only accept that UI-test shape when the target already
+  has a stable loading/failure fixture convention, or when the ticket explicitly
+  requires end-to-end loading/failure UI proof and the fixture can hold the
+  state deterministically until observed.
+- For public OSS iOS smoke runs, generated UI tests should bias toward stable
+  post-success interactions and navigation. A loading/error UI test that only
+  proves a control is absent during a transient state is suspect unless it is
+  driven by a production-owned, deterministic state seam. Flag codegen that adds
+  `sleep(.distantFuture)`, very long `Task.sleep` calls, `while true` waits, or
+  new launch arguments such as `--uitesting-loading` solely to freeze the app in
+  loading/failure state.
 - Generated unit/view-model tests assert product behavior directly. Avoid
   brittle tests that inspect source text, depend on unordered async timing, or
   require device-only capabilities.
@@ -98,9 +107,19 @@ scope at warning/error severity when the reviewed diff supports them.
   tests for a requested filter/search/navigation behavior but the generated
   tests can pass when that behavior is absent.
 - **D/error:** the ticket explicitly requires loading or failure-state proof and
-  the generated UI test depends only on fixed sleeps, short fixture delays, or a
-  small timeout race to observe the transient state instead of a deterministic
-  UI-test launch mode or controllable fixture hook.
+  the generated test depends only on fixed sleeps, short fixture delays,
+  `Task.sleep`, a repository that never returns, or a small timeout race to
+  observe the transient state instead of a deterministic production-owned state
+  seam or an existing stable UI-test fixture hook.
+- **D/error:** a generated UI test invents a new infinite-loading or
+  never-returning fixture solely to prove absence of a new control outside
+  success state, when the same contract could be proven through a deterministic
+  view-model/state seam or when the target does not already own a stable
+  loading/failure fixture. Treat `sleep(.distantFuture)`, unbounded
+  `Task.sleep`, `while true`, or one-off `--uitesting-loading` /
+  `--uitesting-failure` app startup paths as blocking unless the ticket
+  explicitly requires end-to-end transient-state proof and the fixture is
+  deterministic.
 - **B/warning:** advisory test-quality gaps, overstated test metadata,
   non-blocking uncertainty caused by progressive review clustering, or minor
   copy assertions when the product behavior itself is implemented and covered.
