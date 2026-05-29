@@ -47,6 +47,22 @@ private struct UITestingCharacterRepository: CharacterRepositoryProtocol {
                 species: "Human",
                 gender: "Male",
                 image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg"
+            ),
+            Character(
+                id: 8,
+                name: "Adjudicator Rick",
+                status: .dead,
+                species: "Human",
+                gender: "Male",
+                image: "https://rickandmortyapi.com/api/character/avatar/8.jpeg"
+            ),
+            Character(
+                id: 13,
+                name: "Alien Googah",
+                status: .unknown,
+                species: "Alien",
+                gender: "unknown",
+                image: "https://rickandmortyapi.com/api/character/avatar/13.jpeg"
             )
         ]
     }
