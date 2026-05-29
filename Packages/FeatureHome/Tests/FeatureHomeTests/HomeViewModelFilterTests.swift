@@ -72,12 +72,49 @@ final class HomeViewModelFilterTests: XCTestCase {
         _ = await successCharacters(in: viewModel)
 
         viewModel.selectedFilter = .alive
-        _ = await successCharacters(in: viewModel)
+        XCTAssertEqual(await successCharacters(in: viewModel).map(\.id), [1, 2])
         viewModel.selectedFilter = .all
         let characters = await successCharacters(in: viewModel)
 
-        XCTAssertEqual(characters.count, 4)
+        XCTAssertEqual(characters.map(\.id), [1, 2, 3, 4])
+        try? await Task.sleep(nanoseconds: 10_000_000)
         XCTAssertEqual(repository.fetchCallCount, 1)
+    }
+
+    @MainActor
+    func testPreselectedFilterIsAppliedWhenFetchCompletes() async {
+        registerRepository(with: mixedStatusCharacters())
+        let viewModel = HomeViewModel()
+
+        viewModel.selectedFilter = .dead
+        viewModel.fetchCharacters()
+        let characters = await successCharacters(in: viewModel)
+
+        XCTAssertEqual(characters.map(\.id), [3])
+        XCTAssertTrue(characters.allSatisfy { $0.status == .dead })
+    }
+
+    @MainActor
+    func testSelectedFilterIsPreservedWhenFetchCharactersRefreshesAfterInitialLoad() async {
+        let repository = registerRepository(with: mixedStatusCharacters())
+        let viewModel = HomeViewModel()
+
+        viewModel.fetchCharacters()
+        _ = await successCharacters(in: viewModel)
+        viewModel.selectedFilter = .unknown
+        XCTAssertEqual(await successCharacters(in: viewModel).map(\.id), [4])
+
+        repository.replaceCharacters(with: [
+            character(id: 6, name: "Squanchy", status: .alive),
+            character(id: 7, name: "Birdperson", status: .dead),
+            character(id: 8, name: "Dr. Wong", status: .unknown)
+        ])
+        viewModel.fetchCharacters()
+        let characters = await successCharacters(in: viewModel)
+
+        XCTAssertEqual(characters.map(\.id), [8])
+        XCTAssertTrue(characters.allSatisfy { $0.status == .unknown })
+        XCTAssertEqual(repository.fetchCallCount, 2)
     }
 
     //harness:criterion=c-filter-all-shows-every-character
@@ -180,10 +217,15 @@ final class HomeViewModelFilterTests: XCTestCase {
         _ = await successCharacters(in: viewModel)
 
         viewModel.selectedFilter = .alive
+        XCTAssertEqual(await successCharacters(in: viewModel).map(\.id), [1, 2])
         viewModel.selectedFilter = .dead
+        XCTAssertEqual(await successCharacters(in: viewModel).map(\.id), [3])
         viewModel.selectedFilter = .unknown
+        XCTAssertEqual(await successCharacters(in: viewModel).map(\.id), [4])
         viewModel.selectedFilter = .all
+        XCTAssertEqual(await successCharacters(in: viewModel).map(\.id), [1, 2, 3, 4])
 
+        try? await Task.sleep(nanoseconds: 10_000_000)
         XCTAssertEqual(repository.fetchCallCount, 1)
     }
 
@@ -193,14 +235,12 @@ final class HomeViewModelFilterTests: XCTestCase {
         registerRepository(with: mixedStatusCharacters())
         let selectedCharacter = character(id: 42, name: "Pickle Rick", status: .alive)
 
-        assertDidSelectInvokesDetailCallbackOnce(
-            selectedFilter: .all,
-            character: selectedCharacter
-        )
-        assertDidSelectInvokesDetailCallbackOnce(
-            selectedFilter: .alive,
-            character: selectedCharacter
-        )
+        for selectedFilter in CharacterStatusFilter.allCases {
+            assertDidSelectInvokesDetailCallbackOnce(
+                selectedFilter: selectedFilter,
+                character: selectedCharacter
+            )
+        }
     }
 
     @MainActor
@@ -234,10 +274,15 @@ final class HomeViewModelFilterTests: XCTestCase {
         viewModel.selectedFilter = .alive
         let aliveCharacter = await successCharacters(in: viewModel).first!
 
+        var callbackCount = 0
         var receivedCharacter: Character?
-        viewModel.onDetailRequested = { receivedCharacter = $0 }
+        viewModel.onDetailRequested = {
+            callbackCount += 1
+            receivedCharacter = $0
+        }
         viewModel.didSelect(character: aliveCharacter)
 
+        XCTAssertEqual(callbackCount, 1)
         XCTAssertEqual(receivedCharacter?.id, aliveCharacter.id)
         XCTAssertEqual(receivedCharacter?.name, aliveCharacter.name)
         XCTAssertEqual(receivedCharacter?.status, aliveCharacter.status)
@@ -294,7 +339,7 @@ final class HomeViewModelFilterTests: XCTestCase {
 }
 
 private final class FakeCharacterRepository: CharacterRepositoryProtocol, @unchecked Sendable {
-    private let characters: [Character]
+    private var characters: [Character]
     private let lock = NSLock()
     private var _fetchCallCount = 0
 
@@ -308,8 +353,20 @@ private final class FakeCharacterRepository: CharacterRepositoryProtocol, @unche
         self.characters = characters
     }
 
+    func replaceCharacters(with characters: [Character]) {
+        lock.lock()
+        defer { lock.unlock() }
+        self.characters = characters
+    }
+
     func fetchCharacters() async throws -> [Character] {
         incrementFetchCallCount()
+        return snapshotCharacters()
+    }
+
+    private func snapshotCharacters() -> [Character] {
+        lock.lock()
+        defer { lock.unlock() }
         return characters
     }
 

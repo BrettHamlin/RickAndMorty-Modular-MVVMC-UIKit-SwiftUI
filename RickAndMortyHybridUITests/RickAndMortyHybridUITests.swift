@@ -106,6 +106,10 @@ final class FeatureHomeUITests: XCTestCase {
         waitForCharacterList()
 
         XCTAssertTrue(filterPicker.exists)
+        XCTAssertGreaterThanOrEqual(
+            app.descendants(matching: .any).matching(identifier: "filter_picker").count,
+            1
+        )
     }
 
     //harness:criterion=c-homeview-picker-not-shown-outside-success
@@ -120,6 +124,9 @@ final class FeatureHomeUITests: XCTestCase {
     func testAllFilterShowsCharactersForEveryStatus() throws {
         launchApp()
         waitForCharacterList()
+
+        selectFilter("Alive")
+        assertRowHidden(named: "Birdperson")
 
         selectFilter("All")
 
@@ -180,5 +187,13 @@ final class FeatureHomeUITests: XCTestCase {
         let detailName = app.staticTexts["detail_character_name"]
         XCTAssertTrue(detailName.waitForExistence(timeout: 3), "Detay sayfasına geçiş yapılamadı!")
         XCTAssertEqual(detailName.label, "Rick Sanchez")
+    }
+}
+
+private extension XCUIElement {
+    func waitForNonExistence(timeout: TimeInterval) -> Bool {
+        let predicate = NSPredicate(format: "exists == false")
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
+        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
     }
 }

@@ -25,25 +25,35 @@ public final class HomeViewModel: ObservableObject {
     @Inject private var repository: CharacterRepositoryProtocol
     private var allCharacters: [Character] = []
     private var hasFetchedCharacters = false
+    private var isFetchingCharacters = false
     private var fetchGeneration = 0
 
     public init() {}
 
     public func fetchCharacters() {
+        guard !isFetchingCharacters else { return }
+
         fetchGeneration += 1
         let currentGeneration = fetchGeneration
         allCharacters = []
         hasFetchedCharacters = false
+        isFetchingCharacters = true
         state = .loading
         Task {
             do {
                 let result = try await repository.fetchCharacters()
                 guard currentGeneration == fetchGeneration else { return }
+                isFetchingCharacters = false
+                guard !result.isEmpty else {
+                    state = .failure("Karakter listesi boş geldi.")
+                    return
+                }
                 allCharacters = result
                 hasFetchedCharacters = true
                 applySelectedFilter()
             } catch {
                 guard currentGeneration == fetchGeneration else { return }
+                isFetchingCharacters = false
                 state = .failure(error.localizedDescription)
             }
         }
@@ -57,11 +67,6 @@ public final class HomeViewModel: ObservableObject {
 
     private func applySelectedFilter() {
         guard hasFetchedCharacters else { return }
-
-        guard !allCharacters.isEmpty else {
-            state = .failure("Karakter listesi boş geldi.")
-            return
-        }
 
         state = .success(selectedFilter.characters(from: allCharacters))
     }
