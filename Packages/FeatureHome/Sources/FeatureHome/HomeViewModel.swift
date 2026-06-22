@@ -10,16 +10,56 @@ import Core
 import Domain
 import SwiftUI
 
+public enum CharacterStatusFilter: CaseIterable, Identifiable, Sendable {
+    case all
+    case alive
+    case dead
+    case unknown
+    
+    public var id: Self { self }
+    
+    var title: String {
+        switch self {
+        case .all:
+            return "All"
+        case .alive:
+            return "Alive"
+        case .dead:
+            return "Dead"
+        case .unknown:
+            return "Unknown"
+        }
+    }
+}
+
 @MainActor
 public final class HomeViewModel: ObservableObject {
     
     @Published public var state: HomeViewState = .loading
+    @Published public var selectedFilter: CharacterStatusFilter = .all
     
     public var onDetailRequested: ((Character) -> Void)?
     
     @Inject private var repository: CharacterRepositoryProtocol
     
     public init() {}
+    
+    public var filteredCharacters: [Character] {
+        guard case .success(let characters) = state else {
+            return []
+        }
+        
+        switch selectedFilter {
+        case .all:
+            return characters
+        case .alive:
+            return characters.filter { $0.status == .alive }
+        case .dead:
+            return characters.filter { $0.status == .dead }
+        case .unknown:
+            return characters.filter { $0.status == .unknown }
+        }
+    }
     
     public func fetchCharacters() {
         state = .loading
