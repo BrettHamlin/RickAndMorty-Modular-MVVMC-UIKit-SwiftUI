@@ -197,6 +197,13 @@
 			);
 			mainGroup = 1F47D78D2F1744C400241B8C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1FD921632F22B10000E334F4 /* XCLocalSwiftPackageReference "Core" */,
+				1FD921642F22B10000E334F4 /* XCLocalSwiftPackageReference "Data" */,
+				1FD921652F22B10000E334F4 /* XCLocalSwiftPackageReference "Domain" */,
+				1FD921662F22B10000E334F4 /* XCLocalSwiftPackageReference "FeatureHome" */,
+				1FD921672F22B10000E334F4 /* XCLocalSwiftPackageReference "Infrastructure" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1F47D7972F1744C400241B8C /* Products */;
 			projectDirPath = "";
@@ -498,25 +505,53 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		1FD921632F22B10000E334F4 /* XCLocalSwiftPackageReference "Core" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Core;
+		};
+		1FD921642F22B10000E334F4 /* XCLocalSwiftPackageReference "Data" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Data;
+		};
+		1FD921652F22B10000E334F4 /* XCLocalSwiftPackageReference "Domain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Domain;
+		};
+		1FD921662F22B10000E334F4 /* XCLocalSwiftPackageReference "FeatureHome" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/FeatureHome;
+		};
+		1FD921672F22B10000E334F4 /* XCLocalSwiftPackageReference "Infrastructure" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Infrastructure;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		1FD921432F223F9700E334F4 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 1FD921632F22B10000E334F4 /* XCLocalSwiftPackageReference "Core" */;
 			productName = Core;
 		};
 		1FD921452F223F9700E334F4 /* Data */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 1FD921642F22B10000E334F4 /* XCLocalSwiftPackageReference "Data" */;
 			productName = Data;
 		};
 		1FD921472F223F9700E334F4 /* Domain */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 1FD921652F22B10000E334F4 /* XCLocalSwiftPackageReference "Domain" */;
 			productName = Domain;
 		};
 		1FD921492F223F9700E334F4 /* FeatureHome */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 1FD921662F22B10000E334F4 /* XCLocalSwiftPackageReference "FeatureHome" */;
 			productName = FeatureHome;
 		};
 		1FD9214B2F223F9700E334F4 /* Infrastructure */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 1FD921672F22B10000E334F4 /* XCLocalSwiftPackageReference "Infrastructure" */;
 			productName = Infrastructure;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Character: Decodable, Identifiable, Sendable {
+public struct Character: Decodable, Equatable, Identifiable, Sendable {
     public let id: Int
     public let name: String
     public let status: CharacterStatusType
@@ -33,7 +33,8 @@ public struct CharacterResponse: Decodable, Sendable {
     }
 }
 
-public enum CharacterStatusType: String, Decodable, Sendable {
+public enum CharacterStatusType: String, CaseIterable, Decodable, Sendable {
+    case all = "All"
     case alive = "Alive"
     case dead  = "Dead"
     case unknown = "unknown"
